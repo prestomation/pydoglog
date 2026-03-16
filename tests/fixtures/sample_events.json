@@ -1,0 +1,59 @@
+{
+  "-NxEvent001": {
+    "date": 1710500000000,
+    "type": 0,
+    "petId": "pet_001",
+    "pet": "Sharky",
+    "comment": "Breakfast kibble",
+    "user": "uid_abc123",
+    "userName": "test@example.com",
+    "visible": true,
+    "photoevent": false
+  },
+  "-NxEvent002": {
+    "date": 1710490000000,
+    "type": 2,
+    "petId": "pet_001",
+    "pet": "Sharky",
+    "comment": "Morning walk",
+    "user": "uid_abc123",
+    "userName": "test@example.com",
+    "visible": true,
+    "photoevent": false
+  },
+  "-NxEvent003": {
+    "date": 1710480000000,
+    "type": 4,
+    "petId": "pet_002",
+    "pet": "Luna",
+    "comment": "",
+    "user": "uid_abc123",
+    "userName": "test@example.com",
+    "visible": true,
+    "photoevent": false
+  },
+  "-NxEvent004": {
+    "date": 1710470000000,
+    "type": 12,
+    "petId": "pet_001",
+    "pet": "Sharky",
+    "comment": "Vet visit",
+    "user": "uid_abc123",
+    "userName": "test@example.com",
+    "visible": true,
+    "photoevent": false,
+    "weightKg": 25.5,
+    "weightMeasure": "Kilograms"
+  },
+  "-NxEvent005": {
+    "date": 1710460000000,
+    "type": 1,
+    "petId": "pet_001",
+    "pet": "Sharky",
+    "comment": "Good boy treat",
+    "user": "uid_abc123",
+    "userName": "test@example.com",
+    "visible": true,
+    "photoevent": false
+  }
+}

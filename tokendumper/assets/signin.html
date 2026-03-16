@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body { font-family: sans-serif; text-align: center; padding: 16px; background: #fafafa; }
+button { padding: 12px 24px; font-size: 15px; margin: 6px; border: none; border-radius: 8px; color: white; }
+.blue { background: #4285F4; } .green { background: #34A853; }
+.box { margin: 10px auto; padding: 10px; background: #fff; border: 2px solid #ddd;
+       border-radius: 8px; font-size: 9px; word-break: break-all; text-align: left;
+       max-width: 95%; display: none; user-select: all; -webkit-user-select: all; }
+#status { margin: 10px; font-size: 13px; color: #444; }
+label { font-weight: bold; font-size: 11px; color: #666; display: block; margin-top: 8px; }
+</style>
+</head>
+<body>
+<h2>🐾 DogClaw Auth</h2>
+<button class="blue" onclick="signIn()">Sign In with Google</button>
+<button class="green" onclick="showTokens()">Show Tokens</button>
+<div id="status">Ready</div>
+<label>REFRESH TOKEN (long-press → select all → copy)</label>
+<div class="box" id="refreshBox"></div>
+<label>ID TOKEN</label>
+<div class="box" id="idBox"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+firebase.initializeApp({
+    apiKey: "AIzaSyCBNSh63pQeV7qB1igqF_QK56xTXuAS-zE",
+    authDomain: "doglog-18366.firebaseapp.com",
+    projectId: "doglog-18366",
+    appId: "1:727208592142:android:f02e60b1229ffa28"
+});
+var provider = new firebase.auth.GoogleAuthProvider();
+
+function signIn() {
+    document.getElementById('status').innerText = 'Redirecting...';
+    firebase.auth().signInWithRedirect(provider);
+}
+
+function showTokens() {
+    var user = firebase.auth().currentUser;
+    if (!user) { document.getElementById('status').innerText = 'Not signed in - tap Sign In first'; return; }
+    document.getElementById('status').innerText = 'Getting tokens...';
+    user.getIdToken(true).then(function(idToken) {
+        document.getElementById('refreshBox').style.display = 'block';
+        document.getElementById('refreshBox').innerText = user.refreshToken;
+        document.getElementById('idBox').style.display = 'block';
+        document.getElementById('idBox').innerText = idToken;
+        document.getElementById('status').innerText = 'Signed in: ' + user.email + ' — copy REFRESH TOKEN first!';
+        if (window.Android) window.Android.saveToken('REFRESH=' + user.refreshToken + '\nID=' + idToken + '\nUID=' + user.uid + '\nEMAIL=' + user.email);
+    });
+}
+
+firebase.auth().getRedirectResult().then(function(r) {
+    if (r && r.user) { document.getElementById('status').innerText = 'Signed in: ' + r.user.email + ' — tap Show Tokens'; }
+}).catch(function(e) { document.getElementById('status').innerText = 'Error: ' + e.message; });
+
+firebase.auth().onAuthStateChanged(function(user) {
+    if (user) document.getElementById('status').innerText = 'Signed in: ' + user.email + ' — tap Show Tokens';
+});
+</script>
+</body>
+</html>
