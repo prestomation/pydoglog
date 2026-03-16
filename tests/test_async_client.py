@@ -8,12 +8,12 @@ import pytest
 from aioresponses import aioresponses
 
 from pydoglog.async_client import AsyncDogLogClient, FIREBASE_DB_URL
+from pydoglog.auth import FIREBASE_API_KEY
 from pydoglog.exceptions import DogLogAuthError, DogLogAPIError
 
 FAKE_TOKEN = "fake-id-token"
 FAKE_REFRESH = "fake-refresh-token"
 FAKE_UID = "user123"
-FIREBASE_API_KEY = "AIzaSyCBNSh63pQeV7qB1igqF_QK56xTXuAS-zE"
 TOKEN_URL = f"https://securetoken.googleapis.com/v1/token?key={FIREBASE_API_KEY}"
 
 

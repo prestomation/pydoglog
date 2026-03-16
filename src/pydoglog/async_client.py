@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import time
 from pathlib import Path
 
@@ -134,7 +135,7 @@ class AsyncDogLogClient:
                 body = await resp.read()
                 if not body or body.strip() == b"null":
                     return None
-                return await resp.json()
+                return json.loads(body)
 
         # 401 path: try one refresh and retry
         if self.refresh_token:
@@ -154,7 +155,7 @@ class AsyncDogLogClient:
                 body = await resp.read()
                 if not body or body.strip() == b"null":
                     return None
-                return await resp.json()
+                return json.loads(body)
 
         raise DogLogAuthError(f"Authentication failed for {path}")
 
@@ -298,7 +299,7 @@ class AsyncDogLogClient:
                 event[field] = extra[field]
 
         result = await self._db_post(f"packs/{pack_id}/events", event)
-        return result.get("name", "")
+        return result.get("name", "") if result else ""
 
     async def delete_event(self, pack_id: str, event_id: str) -> None:
         """Delete an event by ID."""
