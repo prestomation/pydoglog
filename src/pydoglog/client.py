@@ -232,13 +232,13 @@ class DogLogClient:
             event_type = EventType.from_name(event_type)
 
         self.ensure_token()
-        now_ms = int(time.time() * 1000)
+        now = int(time.time())
         event = {
             "user": self.uid,
             "userName": self.email,
             "petId": dog_id,
             "pet": dog_name or dog_id,
-            "date": now_ms,
+            "date": now,
             "type": event_type.value,
             "comment": note,
             "visible": True,
