@@ -29,6 +29,15 @@ def fake_config(tmp_path):
     return config_path
 
 
+@pytest.fixture(autouse=True)
+def isolate_config(tmp_path, monkeypatch):
+    """Safety net: redirect DEFAULT_CONFIG_PATH to a temp dir so tests never touch ~/.doglog/config.json."""
+    safe_path = tmp_path / "config.json"
+    monkeypatch.setattr("pydoglog.auth.DEFAULT_CONFIG_PATH", safe_path)
+    monkeypatch.setattr("pydoglog.client.DEFAULT_CONFIG_PATH", safe_path)
+    monkeypatch.setattr("pydoglog.async_client.DEFAULT_CONFIG_PATH", safe_path)
+
+
 @pytest.fixture
 def expired_config(tmp_path):
     """Create a config file with an expired token."""

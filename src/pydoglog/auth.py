@@ -29,6 +29,9 @@ def load_config(config_path: Path | str | None = None) -> dict:
     """Load saved credentials from a JSON config file.
 
     Returns an empty dict if the file doesn't exist or is invalid.
+
+    In tests, always pass an explicit ``config_path`` (e.g. from a tmp_path
+    fixture) so that the real ``~/.doglog/config.json`` is never read.
     """
     path = Path(config_path) if config_path else DEFAULT_CONFIG_PATH
     if not path.exists():
@@ -40,7 +43,11 @@ def load_config(config_path: Path | str | None = None) -> dict:
 
 
 def save_config(data: dict, config_path: Path | str | None = None) -> None:
-    """Persist credentials to a JSON config file (mode 0600)."""
+    """Persist credentials to a JSON config file (mode 0600).
+
+    In tests, always pass an explicit ``config_path`` so that the real
+    ``~/.doglog/config.json`` is never written.
+    """
     path = Path(config_path) if config_path else DEFAULT_CONFIG_PATH
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2))
