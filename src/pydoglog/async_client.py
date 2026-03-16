@@ -100,9 +100,14 @@ class AsyncDogLogClient:
                 text = await resp.text()
                 raise DogLogAuthError(f"Token refresh failed: {text}")
             data = await resp.json()
-        self.id_token = data["id_token"]
-        self.refresh_token = data["refresh_token"]
-        self.expires_at = time.time() + int(data["expires_in"]) - 60
+        try:
+            self.id_token = data["id_token"]
+            self.refresh_token = data["refresh_token"]
+            self.expires_at = time.time() + int(data["expires_in"]) - 60
+        except (KeyError, ValueError) as exc:
+            raise DogLogAuthError(
+                f"Malformed token refresh response: {exc}"
+            ) from exc
         self._save()
 
     async def ensure_token(self) -> None:
@@ -135,7 +140,13 @@ class AsyncDogLogClient:
                 body = await resp.read()
                 if not body or body.strip() == b"null":
                     return None
-                return json.loads(body)
+                try:
+                    return json.loads(body)
+                except json.JSONDecodeError as exc:
+                    raise DogLogAPIError(
+                        f"Invalid JSON response for {method} {path}: {exc}",
+                        path=path,
+                    ) from exc
 
         # 401 path: try one refresh and retry
         if self.refresh_token:
@@ -155,7 +166,13 @@ class AsyncDogLogClient:
                 body = await resp.read()
                 if not body or body.strip() == b"null":
                     return None
-                return json.loads(body)
+                try:
+                    return json.loads(body)
+                except json.JSONDecodeError as exc:
+                    raise DogLogAPIError(
+                        f"Invalid JSON response for {method} {path}: {exc}",
+                        path=path,
+                    ) from exc
 
         raise DogLogAuthError(f"Authentication failed for {path}")
 
@@ -176,8 +193,15 @@ class AsyncDogLogClient:
 
     # -- Public API --
 
+    def _require_uid(self) -> str:
+        """Return uid or raise DogLogAuthError if not set."""
+        if not self.uid:
+            raise DogLogAuthError("No uid available. Login first.")
+        return self.uid
+
     async def get_packs(self) -> list[Pack]:
         """Return all packs the current user belongs to."""
+        self._require_uid()
         await self.ensure_token()
         user = await self._db_get(f"users/{self.uid}")
         if not user or "packs" not in user:
@@ -205,6 +229,8 @@ class AsyncDogLogClient:
 
     async def get_dogs(self, pack_id: str | None = None) -> list[Dog]:
         """Return all dogs, optionally filtered to a single pack."""
+        if not pack_id:
+            self._require_uid()
         await self.ensure_token()
         if pack_id:
             pack_ids = [pack_id]
@@ -274,6 +300,7 @@ class AsyncDogLogClient:
         **extra,
     ) -> str:
         """Log a new event. Returns the Firebase event ID."""
+        self._require_uid()
         if isinstance(event_type, str):
             event_type = EventType.from_name(event_type)
 
@@ -307,6 +334,7 @@ class AsyncDogLogClient:
 
     async def get_user_data(self) -> dict:
         """Return the raw user data dict from Firebase."""
+        self._require_uid()
         await self.ensure_token()
         data = await self._db_get(f"users/{self.uid}")
         if data is None:

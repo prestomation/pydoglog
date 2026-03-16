@@ -146,7 +146,7 @@ async def test_auth_error_no_token():
     )
     assert client.id_token is None
     async with client:
-        with pytest.raises(DogLogAuthError, match="Not authenticated"):
+        with pytest.raises(DogLogAuthError):
             await client.get_packs()
 
 
