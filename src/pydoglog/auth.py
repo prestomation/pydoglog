@@ -21,6 +21,15 @@ FIREBASE_API_KEY = "AIzaSyCBNSh63pQeV7qB1igqF_QK56xTXuAS-zE"
 FIREBASE_AUTH_URL = "https://identitytoolkit.googleapis.com/v1/accounts"
 GOOGLE_OAUTH_CLIENT_ID = "727208592142-3bvib9btsl71ddapj9b6pgn9ppvd8ov9.apps.googleusercontent.com"
 
+# Android app identity headers required by Firebase API key restrictions.
+# Extracted from the DogLog APK signing certificate.
+ANDROID_PACKAGE = "com.mobikode.dog"
+ANDROID_CERT_SHA1 = "A82BA788006FD9FA0C45882A10210A07FDAD8CEB"
+ANDROID_HEADERS = {
+    "X-Android-Package": ANDROID_PACKAGE,
+    "X-Android-Cert": ANDROID_CERT_SHA1,
+}
+
 DEFAULT_CONFIG_DIR = Path.home() / ".doglog"
 DEFAULT_CONFIG_PATH = DEFAULT_CONFIG_DIR / "config.json"
 
@@ -66,6 +75,7 @@ def refresh_id_token(refresh_token: str, api_key: str = FIREBASE_API_KEY) -> dic
             "grant_type": "refresh_token",
             "refresh_token": refresh_token,
         },
+        headers=ANDROID_HEADERS,
     )
     if resp.status_code != 200:
         raise DogLogAuthError(f"Token refresh failed: {resp.text}")
@@ -85,6 +95,7 @@ def login_email_password(email: str, password: str, api_key: str = FIREBASE_API_
     resp = requests.post(
         f"{FIREBASE_AUTH_URL}:signInWithPassword?key={api_key}",
         json={"email": email, "password": password, "returnSecureToken": True},
+        headers=ANDROID_HEADERS,
     )
     if resp.status_code != 200:
         err = resp.json().get("error", {})
@@ -107,6 +118,7 @@ def signup_email_password(email: str, password: str, api_key: str = FIREBASE_API
     resp = requests.post(
         f"{FIREBASE_AUTH_URL}:signUp?key={api_key}",
         json={"email": email, "password": password, "returnSecureToken": True},
+        headers=ANDROID_HEADERS,
     )
     if resp.status_code != 200:
         err = resp.json().get("error", {})

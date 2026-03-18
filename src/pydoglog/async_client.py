@@ -95,6 +95,10 @@ class AsyncDogLogClient:
                 "grant_type": "refresh_token",
                 "refresh_token": self.refresh_token,
             },
+            headers={
+                "X-Android-Package": "com.mobikode.dog",
+                "X-Android-Cert": "A82BA788006FD9FA0C45882A10210A07FDAD8CEB",
+            },
         ) as resp:
             if resp.status != 200:
                 text = await resp.text()
